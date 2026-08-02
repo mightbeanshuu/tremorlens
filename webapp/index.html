@@ -6,7 +6,7 @@
 <title>TremorLens Live: your phone is a structural sensor</title>
 <style>
   :root { --bg:#1a1a19; --panel:#232322; --ink:#fff; --ink2:#c3c2b7; --grid:#33332f;
-          --blue:#3987e5; --orange:#d95926; --green:#3fb950; --amber:#d29922; --red:#f85149; }
+          --blue:#2DD4BF; --teal:#159C8E; --orange:#d95926; --green:#3fb950; --amber:#d29922; --red:#f85149; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:var(--bg); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
          min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px 16px 40px; }
@@ -23,9 +23,9 @@
   .row .card { flex:1; }
   .lbl { font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--ink2); margin-bottom:6px; }
   canvas.plot { width:100%; height:150px; display:block; border-radius:8px; background:var(--bg); }
-  video { width:100%; border-radius:8px; display:none; background:#000; }
+  video { width:100%; max-height:62vh; object-fit:cover; border-radius:8px; background:#000; }
   button { width:100%; padding:14px; border:none; border-radius:12px; font-size:1rem; font-weight:600;
-           background:var(--blue); color:#fff; cursor:pointer; margin-bottom:10px; }
+           background:var(--teal); color:#fff; cursor:pointer; margin-bottom:10px; }
   button.secondary { background:var(--panel); border:1px solid var(--grid); color:var(--ink2); }
   button.cam { background:var(--orange); }
   button:disabled { opacity:.45; }
@@ -60,7 +60,7 @@
      font:600 .75rem ui-monospace,Menlo,monospace; padding:6px 14px; border-radius:999px">
   ▶ REPLAY — simulated ground-truth record · live processing</div>
 <div class="wrap">
-  <h1>TremorLens <span class="sp">·</span> SPANDAN Live</h1>
+  <h1><svg width="26" height="26" viewBox="0 0 64 64" style="vertical-align:-4px;margin-right:8px"><circle cx="32" cy="32" r="27" fill="none" stroke="#2DD4BF" stroke-width="5"/><path d="M10 32 h12 l5 -14 l9 26 l6 -12 h12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>TremorLens <span class="sp">·</span> SPANDAN Live</h1>
   <div class="sub">Every structure vibrates at fixed natural frequencies set by its stiffness.
   Damage means stiffness loss, and the frequencies drop. TremorLens reads that heartbeat two ways:
   its computer-vision engine tracks sub-pixel motion in ordinary video, and a phone accelerometer
@@ -300,7 +300,7 @@ function draw(freqs, psd, f1, fmaxView) {
   for (let i = 0; i < freqs.length; i++)
     if (freqs[i] >= fmin && freqs[i] <= fmax) pmax = Math.max(pmax, psd[i]);
   if (!pmax) return;
-  ctx.strokeStyle = "#3987e5"; ctx.lineWidth = 3; ctx.beginPath();
+  ctx.strokeStyle = "#2DD4BF"; ctx.lineWidth = 3; ctx.beginPath();
   let started = false;
   for (let i = 0; i < freqs.length; i++) {
     if (freqs[i] < fmin || freqs[i] > fmax) continue;
@@ -733,6 +733,7 @@ function profileOf(data, w, h) {
   for (let y = 0; y < h; y++) { p[y] -= mean; sd += p[y] * p[y]; }
   sd = Math.sqrt(sd / h) || 1;
   for (let y = 0; y < h; y++) p[y] /= sd;
+  p.contrast = sd;   // texture quality: low sd = featureless surface = untrackable
   return p;
 }
 function shiftOf(ref, cur, maxLag) {
@@ -847,7 +848,9 @@ function camFrame(now, meta) {
       const sy = Math.max(0, Math.min(1 - AH, a.fy - AH/2)) * vh;
       camCtx.drawImage(vid, sx, sy, vw * AW, vh * AH, 0, 0, CAM_W, CAM_H);
       const prof = profileOf(camCtx.getImageData(0, 0, CAM_W, CAM_H).data, CAM_W, CAM_H);
-      if (!a.ref) a.ref = prof;
+      a.low = prof.contrast < 5;                 // featureless: flag, never fake a reading
+      if (a.low) { a.cur = 0; a.hist.length = 0; }
+      else if (!a.ref) a.ref = prof;
       else {
         const s = shiftOf(a.ref, prof, 18);
         a.cur = s;
@@ -905,21 +908,31 @@ function drawAR(vw, vh) {
   if (cv.width !== vw) { cv.width = vw; cv.height = vh; }
   arCtx.clearRect(0, 0, vw, vh);
   for (const a of anchors) {
-    if (!a.hist.length) continue;
     const cx = a.fx * vw, cy = a.fy * vh;
+    if (a.low) {  // featureless surface: say so honestly, draw nothing alarming
+      arCtx.strokeStyle = "#8b93a5"; arCtx.setLineDash([8, 8]); arCtx.lineWidth = 2;
+      arCtx.globalAlpha = 0.8;
+      arCtx.beginPath(); arCtx.arc(cx, cy, 16, 0, 2 * Math.PI); arCtx.stroke();
+      arCtx.setLineDash([]);
+      arCtx.fillStyle = "#8b93a5"; arCtx.font = "15px ui-monospace,Menlo,monospace";
+      arCtx.fillText("low texture — aim at speckle/edges", cx - 100, cy + 40);
+      arCtx.globalAlpha = 1;
+      continue;
+    }
+    if (!a.hist.length) continue;
     const recent = a.hist.slice(-30);
     const rms = Math.sqrt(recent.reduce((s, v) => s + (v - a.ema) ** 2, 0) / recent.length);
-    const col = rms < 0.5 ? "#3fb950" : rms < 2 ? "#d29922" : "#f85149";
-    // pulsing ring: radius breathes with measured RMS
+    const col = rms < 0.6 ? "#3fb950" : rms < 2.5 ? "#d29922" : "#f85149";
     arCtx.strokeStyle = col; arCtx.lineWidth = 3; arCtx.globalAlpha = 0.85;
     arCtx.beginPath();
-    arCtx.arc(cx, cy, 14 + Math.min(rms * 30, 60), 0, 2 * Math.PI);
+    arCtx.arc(cx, cy, 14 + Math.min(rms * 18, 30), 0, 2 * Math.PI);
     arCtx.stroke();
     // displacement arrow (measured shift x loupe gain)
     const dy = Math.max(-70, Math.min(70, (a.cur - a.ema) * magKf));
     arCtx.beginPath(); arCtx.moveTo(cx, cy); arCtx.lineTo(cx, cy + dy); arCtx.stroke();
-    // pinned mini-ECG strip
-    const ex = Math.min(cx + 30, vw - 100), ey = Math.max(cy - 60, 8);
+    // pinned mini-ECG strip (clamped fully inside the frame)
+    const ex = Math.max(8, Math.min(cx + 34, vw - 100));
+    const ey = Math.max(8, Math.min(cy - 64, vh - 36));
     arCtx.globalAlpha = 0.9; arCtx.fillStyle = "rgba(26,26,25,.75)";
     arCtx.fillRect(ex, ey, 90, 26);
     arCtx.strokeStyle = col; arCtx.lineWidth = 1.5; arCtx.beginPath();
@@ -945,7 +958,10 @@ function drawLoupe(vw, vh) {
   const dy = Math.max(-60, Math.min(60, (a.cur - a.ema) * magKf));
   lpCtx.fillStyle = "#000"; lpCtx.fillRect(0, 0, W, H);
   lpCtx.drawImage(vid, sx, sy, sw, sh, 0, 0, half, H);          // RAW
+  lpCtx.drawImage(vid, sx, sy, sw, sh, half, 0, half, H);       // backdrop (no gaps)
+  lpCtx.globalAlpha = 0.92;
   lpCtx.drawImage(vid, sx, sy, sw, sh, half, dy, half, H);      // measured x K
+  lpCtx.globalAlpha = 1;
   lpCtx.strokeStyle = "#33332f"; lpCtx.beginPath();
   lpCtx.moveTo(half, 0); lpCtx.lineTo(half, H); lpCtx.stroke();
   lpCtx.fillStyle = "#c3c2b7"; lpCtx.font = "14px ui-monospace,Menlo,monospace";

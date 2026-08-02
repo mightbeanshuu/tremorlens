@@ -1,0 +1,12 @@
+.venv/
+data/
+out/
+__pycache__/
+*.mp4
+film/node_modules/
+film/out/
+film/stills/
+submission/stage/
+TremorLens_Submission.zip
+*.png
+!docs/**

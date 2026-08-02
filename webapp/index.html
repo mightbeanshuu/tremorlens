@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TremorLens Live: your phone is a structural sensor</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#0B1020">
 <style>
   :root { --bg:#1a1a19; --panel:#232322; --ink:#fff; --ink2:#c3c2b7; --grid:#33332f;
           --blue:#2DD4BF; --teal:#159C8E; --orange:#d95926; --green:#3fb950; --amber:#d29922; --red:#f85149; }
@@ -914,8 +918,10 @@ function drawAR(vw, vh) {
       arCtx.globalAlpha = 0.8;
       arCtx.beginPath(); arCtx.arc(cx, cy, 16, 0, 2 * Math.PI); arCtx.stroke();
       arCtx.setLineDash([]);
-      arCtx.fillStyle = "#8b93a5"; arCtx.font = "15px ui-monospace,Menlo,monospace";
-      arCtx.fillText("low texture — aim at speckle/edges", cx - 100, cy + 40);
+      arCtx.fillStyle = "#8b93a5"; arCtx.font = "14px ui-monospace,Menlo,monospace";
+      arCtx.textAlign = "center";
+      arCtx.fillText("low texture — aim at edges", cx, Math.min(cy + 42, vh - 12));
+      arCtx.textAlign = "left";
       arCtx.globalAlpha = 1;
       continue;
     }

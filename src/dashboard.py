@@ -110,21 +110,21 @@ img{{max-width:100%;border-radius:8px}}
 
 <div class="kpis">
 <div class="kpi"><b>{dmg["shs"]:.0f}</b><span>Structural Heartbeat Score</span></div>
-<div class="kpi"><b>{R["baseline_f1"]:.2f} Hz</b><span>Baseline f&#8321;</span></div>
-<div class="kpi"><b>{dmg["f1"]:.2f} Hz</b><span>Current f&#8321;</span></div>
-<div class="kpi"><b style="color:{BADC}">-{dmg["drift_pct"]:.1f}%</b><span>Frequency drift</span></div>
-<div class="kpi"><b>{fus["agreement_pct"]:.2f}%</b><span>Camera vs accel gap</span></div>
+<div class="kpi"><b>{R["baseline_f1"]:.2f} Hz</b><span>Healthy vibration rate</span></div>
+<div class="kpi"><b>{dmg["f1"]:.2f} Hz</b><span>Current vibration rate</span></div>
+<div class="kpi"><b style="color:{BADC}">-{dmg["drift_pct"]:.1f}%</b><span>Change vs healthy</span></div>
+<div class="kpi"><b>{fus["agreement_pct"]:.2f}%</b><span>Camera vs phone sensor</span></div>
 </div>
 
-<div class="card"><h2>Modal fingerprint</h2>
-<p class="sub">Displacement spectrum from camera only — no contact sensors. Damaged twin's fundamental
+<div class="card"><h2>Vibration fingerprint</h2>
+<p class="sub">What the camera alone sees: every structure vibrates at its own signature rate. The damaged twin's rate
 has dropped {dmg["drift_pct"]:.1f}% below the healthy baseline.</p>
 <div class="leg"><span><i style="background:{BLUE}"></i>Healthy baseline</span>
 <span><i style="background:{ORANGE}"></i>Damaged twin</span></div>
 {_spectrum_svg(R["hero_spectra"], R["baseline_f1"])}</div>
 
-<div class="card"><h2>Ground truth: contact accelerometer agrees</h2>
-<p class="sub">Phone accelerometer taped to the deck (phyphox export) vs TremorLens camera reading —
+<div class="card"><h2>Cross-check: a phone's motion sensor agrees</h2>
+<p class="sub">A smartphone resting on the structure measures the same vibration by touch. Camera and phone —
 f&#8321; agreement {fus["agreement_pct"]:.2f}% on the damaged twin.</p>
 <img alt="Camera vs accelerometer PSD overlay" src="data:image/png;base64,{_b64(fus["plot"])}"></div>
 
@@ -139,7 +139,7 @@ Calibrated noise floor {R["noise_pct"]:.2f}%.</p>
 <table><tr><th>Run</th><th>GT (Hz)</th><th>Measured</th><th>Error</th><th>SHS</th><th>Status</th></tr>
 {rows}</table></div>
 
-<p style="color:{MUT};font-size:11.5px">TremorLens · SPANDAN Engine — modal fingerprint · dysphonia panel (jitter/HNR/THD) · Mahalanobis novelty · MAC/COMAC + transmissibility localization · DIN 4150-3 / IS-ISO 4866 screening · phase-based lineage (
+<p style="color:{MUT};font-size:11.5px">TremorLens · SPANDAN Engine — a smartphone camera measures how a structure vibrates; a second phone cross-checks by touch. When the vibration pattern changes, the structure has changed. Methods: phase-based motion analysis (
 Wu 2012 / Wadhwa 2013) + modal fingerprinting. Educational research prototype.</p>
 </div></body></html>'''
     with open(out_html, "w") as fh:

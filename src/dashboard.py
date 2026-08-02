@@ -86,7 +86,7 @@ def build(results_path: str = "out/results.json", out_html: str = "out/dashboard
 
     html = f'''<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TremorLens — Structural Heartbeat</title><style>
+<title>TremorLens · SPANDAN — Structural Heartbeat</title><style>
 body{{margin:0;background:{SURFACE};color:{INK};font:14px/1.5 -apple-system,'Segoe UI',sans-serif}}
 .wrap{{max-width:960px;margin:0 auto;padding:28px 20px}}
 .h{{display:flex;align-items:baseline;gap:14px}} .h small{{color:{MUT}}}
@@ -104,7 +104,7 @@ td,th{{padding:7px 10px;text-align:left;border-bottom:1px solid {EDGE}}} th{{col
 img{{max-width:100%;border-radius:8px}}
 @media(max-width:720px){{.kpis{{grid-template-columns:repeat(2,1fr)}}}}
 </style></head><body><div class="wrap">
-<div class="h"><h1 style="font-size:20px;margin:0">TremorLens</h1>
+<div class="h"><h1 style="font-size:20px;margin:0;display:flex;align-items:center"><svg width="34" height="34" viewBox="0 0 64 64" style="vertical-align:middle;margin-right:10px"><circle cx="32" cy="32" r="28" fill="none" stroke="#2DD4BF" stroke-width="4"/><path d="M10 32 h12 l5 -14 l9 26 l6 -12 h12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>TremorLens <span style="color:#2DD4BF;font-weight:400;margin-left:10px">· SPANDAN Engine</span></h1>
 <small>Model truss — Bay 3 test rig</small>
 <span class="badge">&#9650; ALERT — SHS {dmg["shs"]:.0f}</span></div>
 
@@ -139,7 +139,7 @@ Calibrated noise floor {R["noise_pct"]:.2f}%.</p>
 <table><tr><th>Run</th><th>GT (Hz)</th><th>Measured</th><th>Error</th><th>SHS</th><th>Status</th></tr>
 {rows}</table></div>
 
-<p style="color:{MUT};font-size:11.5px">TremorLens — phase-based motion magnification (MIT lineage:
+<p style="color:{MUT};font-size:11.5px">TremorLens · SPANDAN Engine — modal fingerprint · dysphonia panel (jitter/HNR/THD) · Mahalanobis novelty · MAC/COMAC + transmissibility localization · DIN 4150-3 / IS-ISO 4866 screening · phase-based lineage (
 Wu 2012 / Wadhwa 2013) + modal fingerprinting. Educational research prototype.</p>
 </div></body></html>'''
     with open(out_html, "w") as fh:

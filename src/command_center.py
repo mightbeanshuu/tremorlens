@@ -40,7 +40,7 @@ border:1px solid var(--bad);color:var(--bad);font-weight:600;font-size:12.5px}
 .foot{color:var(--mut);font-size:10.5px;text-align:center;padding:8px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}
 </style></head><body>
-<div class="top"><span class="dot"></span><h1>TREMORLENS COMMAND CENTRE</h1>
+<div class="top"><span class="dot"></span><h1>TREMORLENS · SPANDAN COMMAND CENTRE</h1>
 <span class="sub">Municipal Bridge Fleet — Camera-Only Structural Monitoring</span>
 <span class="sumchip" id="sum"></span><span class="clock" id="clock"></span></div>
 <div class="grid">
